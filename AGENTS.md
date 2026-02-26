@@ -2,6 +2,7 @@
 
 ## Project Overview
 - `claw-guardrails` is an OpenClaw plugin that enforces multi-layer permission checks before potentially destructive actions.
+- npm package name: `@eveiljuice/claw-guardrails` (plugin id remains `claw-guardrails`).
 - Stack: TypeScript (ESM), Node.js, `@sinclair/typebox`, `minimatch`, `date-fns`.
 - Architecture: tool wrappers (`safe_exec`, `safe_send`, `safe_action`) -> permission resolver -> approval queue -> runtime execution + audit logging.
 - Registered surfaces: `safe_exec`, `safe_send`, `safe_action`, `/perms`, `/approve`, `/deny`, `guardrails.*` RPC, `guardrails` service/CLI.
@@ -16,6 +17,9 @@
 ## Build & Run Commands
 - Type-check build: `npm run build`
 - Check alias: `npm run check`
+- Publish package (after version bump): `npm publish --access public`
+- One-command releases: `npm run release:patch|release:minor|release:major`
+- Update installed plugin on hosts: `openclaw plugins update claw-guardrails`
 - No bundler is required; OpenClaw executes plugin source module directly.
 - Runtime CLI surface: `openclaw guardrails status|audit|policy`
 
@@ -40,6 +44,7 @@
 ## Git & PR Instructions
 - Branch naming suggestion: `feature/guardrails-<scope>` or `fix/guardrails-<scope>`.
 - Commit style suggestion: imperative mood (`add approval queue persistence`).
+- For releases use semver bump via `npm version patch|minor|major` before publish.
 - Before PR: run `npm run check` and validate at least one approval flow manually.
 - PR description should include changed guardrail policies and risk implications.
 

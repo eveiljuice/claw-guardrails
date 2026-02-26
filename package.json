@@ -1,13 +1,31 @@
 {
-  "name": "claw-guardrails",
+  "name": "@eveiljuice/claw-guardrails",
   "version": "0.1.0",
   "description": "OpenClaw plugin for strict guardrails and permission control",
-  "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "main": "index.ts",
+  "files": [
+    "index.ts",
+    "openclaw.plugin.json",
+    "src/**",
+    "skills/**",
+    "README.md"
+  ],
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "guardrails",
+    "permissions",
+    "security"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
-    "check": "npm run build"
+    "check": "npm run build",
+    "prepublishOnly": "npm run check",
+    "release:patch": "npm version patch && npm publish --access public",
+    "release:minor": "npm version minor && npm publish --access public",
+    "release:major": "npm version major && npm publish --access public"
   },
   "dependencies": {
     "@sinclair/typebox": "^0.34.30",

@@ -1,4 +1,4 @@
-# claw-guardrails 🦞
+# lawGuardrails 🦞
 
 OpenClaw plugin that enforces a **4-stage permission pipeline** before any potentially destructive agent action. The agent can only execute shell commands, send channel messages, or trigger external APIs through controlled wrapper tools (`safe_exec`, `safe_send`, `safe_action`) — every call is risk-classified, policy-matched, and optionally routed through a human approval queue.
 
@@ -44,7 +44,13 @@ flowchart TD
 
 ## Installation on production OpenClaw
 
-### Option 1 — `--link` (recommended for local path)
+### Option 1 — install from npm registry (production)
+
+```bash
+openclaw plugins install @eveiljuice/claw-guardrails --pin
+```
+
+### Option 2 — `--link` (recommended for local path)
 
 ```bash
 openclaw plugins install --link /path/to/claw-plugin
@@ -52,7 +58,7 @@ openclaw plugins install --link /path/to/claw-plugin
 
 This registers the folder as a plugin without copying it. Restart the Gateway after.
 
-### Option 2 — Copy to workspace extensions
+### Option 3 — Copy to workspace extensions
 
 ```bash
 cp -r /path/to/claw-plugin ~/.openclaw/extensions/claw-guardrails
@@ -60,7 +66,7 @@ cp -r /path/to/claw-plugin ~/.openclaw/extensions/claw-guardrails
 
 OpenClaw auto-discovers plugins from `~/.openclaw/extensions/*/index.ts`.
 
-### Option 3 — `plugins.load.paths` in config
+### Option 4 — `plugins.load.paths` in config
 
 Add to `~/.openclaw/openclaw.json`:
 
@@ -77,6 +83,28 @@ Add to `~/.openclaw/openclaw.json`:
     }
   }
 }
+```
+
+---
+
+## Publish and update flow
+
+```bash
+npm run release:patch
+```
+
+Alternative:
+
+```bash
+npm run release:minor
+npm run release:major
+```
+
+Then update OpenClaw hosts:
+
+```bash
+openclaw plugins update claw-guardrails
+openclaw plugins update --all
 ```
 
 ---
