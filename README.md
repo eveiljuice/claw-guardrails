@@ -1,4 +1,4 @@
-# lawGuardrails 🦞
+# ClawGuardrails 🦞
 
 OpenClaw plugin that enforces a **4-stage permission pipeline** before any potentially destructive agent action. The agent can only execute shell commands, send channel messages, or trigger external APIs through controlled wrapper tools (`safe_exec`, `safe_send`, `safe_action`) — every call is risk-classified, policy-matched, and optionally routed through a human approval queue.
 
