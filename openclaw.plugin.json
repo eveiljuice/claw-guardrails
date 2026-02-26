@@ -1,0 +1,389 @@
+{
+  "id": "claw-guardrails",
+  "name": "OpenClaw Guardrails",
+  "description": "Strict permission guardrails plugin for safe OpenClaw tool execution.",
+  "version": "0.1.0",
+  "skills": [
+    "skills/guardrails"
+  ],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "defaultAction": {
+        "type": "string",
+        "enum": [
+          "allow",
+          "deny",
+          "require_approval"
+        ],
+        "default": "deny"
+      },
+      "approvalTimeout": {
+        "type": "integer",
+        "minimum": 1,
+        "default": 300
+      },
+      "approvalFallback": {
+        "type": "string",
+        "enum": [
+          "allow",
+          "deny",
+          "require_approval"
+        ],
+        "default": "deny"
+      },
+      "auditLog": {
+        "type": "boolean",
+        "default": true
+      },
+      "auditLogPath": {
+        "type": "string",
+        "default": "~/.openclaw/guardrails/audit.jsonl"
+      },
+      "policies": {
+        "type": "array",
+        "default": [],
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "action",
+            "match"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "allow",
+                "deny",
+                "require_approval"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            },
+            "match": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tools": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "commands": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "resources": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "riskLevel": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "LOW",
+                      "MEDIUM",
+                      "HIGH",
+                      "CRITICAL"
+                    ]
+                  }
+                },
+                "senders": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "channels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "agents": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "contexts": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "senders": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "allow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "*"
+                ]
+              },
+              "deny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            }
+          },
+          "channels": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "allow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "*"
+                ]
+              },
+              "deny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            }
+          },
+          "timeWindows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "start",
+                "end"
+              ],
+              "properties": {
+                "start": {
+                  "type": "string"
+                },
+                "end": {
+                  "type": "string"
+                },
+                "days": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 6
+                  }
+                },
+                "timezone": {
+                  "type": "string"
+                }
+              }
+            },
+            "default": []
+          }
+        }
+      },
+      "resources": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "filesystem": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "readAllow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "**"
+                ]
+              },
+              "readDeny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              },
+              "writeAllow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "~/.openclaw/workspace/**"
+                ]
+              },
+              "writeDeny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "~/.ssh/**",
+                  "~/.openclaw/credentials/**"
+                ]
+              }
+            }
+          },
+          "network": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "allow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "*"
+                ]
+              },
+              "deny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            }
+          },
+          "exec": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "allow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "git *",
+                  "npm *",
+                  "node *",
+                  "ls",
+                  "cat",
+                  "rg *"
+                ]
+              },
+              "deny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "rm -rf *",
+                  "sudo *",
+                  "chmod 777 *",
+                  "curl * | bash"
+                ]
+              },
+              "cwdAllow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "~/.openclaw/workspace/**"
+                ]
+              },
+              "cwdDeny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "~/.ssh/**",
+                  "~/.openclaw/credentials/**"
+                ]
+              }
+            }
+          },
+          "channels": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "readAllow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "*"
+                ]
+              },
+              "writeAllow": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              },
+              "writeDeny": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            }
+          },
+          "database": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "allowOperations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "select"
+                ]
+              },
+              "denyOperations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "drop",
+                  "truncate",
+                  "delete"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
