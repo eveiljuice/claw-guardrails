@@ -6,22 +6,32 @@ OpenClaw plugin that enforces a **4-stage permission pipeline** before any poten
 
 ## Architecture
 
-```
-Agent → safe_exec / safe_send / safe_action
-            ↓
-   ┌────────────────────┐
-   │  Permission Resolver│
-   └────────────────────┘
-        ↓          ↓         ↓         ↓
-  [1] Context  [2] Tool  [3] Resource  [4] Policy
-   Matcher     Checker    Checker       Engine
-  sender/ch   cmd allow  fs/net/db/ch  risk + rules
-                                           ↓
-                               ALLOW / DENY / REQUIRE_APPROVAL
-                                           ↓
-                               Approval Queue ← /approve | RPC
-                                           ↓
-                                  Audit JSONL log
+```mermaid
+flowchart TD
+    A([Agent]) -->|calls| T["safe_exec / safe_send / safe_action"]
+    T --> R["🔒 Permission Resolver"]
+
+    R --> C1["1️⃣ Context Matcher\nsender · channel · time window · agent"]
+    C1 --> C2["2️⃣ Tool Checker\ncmd allow/deny · cwd scope · arg flags"]
+    C2 --> C3["3️⃣ Resource Checker\nfs · network · database · channels"]
+    C3 --> C4["4️⃣ Policy Engine\nrisk classify → first-match rule"]
+
+    C4 -->|ALLOW| OK["✅ Execute via runtime"]
+    C4 -->|DENY| NO["❌ Return denial + reason code"]
+    C4 -->|REQUIRE_APPROVAL| Q["⏳ Approval Queue\n/approve · /deny · RPC · timeout"]
+
+    Q -->|approved| OK
+    Q -->|denied / expired| NO
+
+    OK -.->|writes| L[("📄 Audit JSONL")]
+    NO -.->|writes| L
+    Q -.->|writes| L
+
+    style R fill:#1e3a5f,color:#fff,stroke:#4a90d9
+    style OK fill:#1a4731,color:#fff,stroke:#2ecc71
+    style NO fill:#4a1a1a,color:#fff,stroke:#e74c3c
+    style Q fill:#3d2b00,color:#fff,stroke:#f39c12
+    style L fill:#2d2d2d,color:#ccc,stroke:#666
 ```
 
 **Default behaviour (out of the box):**
